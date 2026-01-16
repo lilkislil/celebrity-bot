@@ -4,25 +4,22 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from groq import Groq
 
-# Логирование
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Загрузка данных персоны
 try:
     with open("persona.txt", "r", encoding="utf-8") as f:
         PERSONA = f.read()
-    logger.info("✅ persona.txt успешно загружен")
+    logger.info("✅ persona.txt")
 except Exception as e:
-    logger.error(f"❌ Ошибка при загрузке persona.txt: {e}")
+    logger.error(f"❌ persona.txt: {e}")
     raise
-
-# Настройка Groq
+    
 try:
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    logger.info("✅ Groq клиент создан")
+    logger.info("✅ Groq")
 except Exception as e:
-    logger.error(f"❌ Ошибка Groq: {e}")
+    logger.error(f"❌ Groq: {e}")
     raise
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -49,7 +46,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
-        logger.error("❌ TELEGRAM_BOT_TOKEN не задан!")
+        logger.error("❌ TELEGRAM_BOT_TOKEN ")
         return
 
     port = int(os.environ.get("PORT", 10000))
@@ -60,14 +57,11 @@ def main():
     if webhook_url:
         logger.info(f"🔗 Webhook URL: {webhook_url}")
 
-    # Создаём Application — НЕ Updater!
     app = Application.builder().token(token).build()
 
-    # Добавляем обработчики
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Запускаем через webhook
     if webhook_url:
         app.run_webhook(
             listen="0.0.0.0",
