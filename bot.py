@@ -42,7 +42,7 @@ router = Router()
 
 @router.message(Command("start"))
 async def cmd_start(message: Message):
-    await message.answer("Привет! Я — ваш виртуальный собеседник. О чём поговорим?")
+    await message.answer("Здраыствуй, меня зовут Ягами Лайт")
 
 @router.message()
 async def handle_message(message: types.Message):
