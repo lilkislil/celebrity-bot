@@ -46,7 +46,7 @@ router = Router()
 
 @router.message(Command("start"))
 async def cmd_start(message: Message):
-    await message.answer("Привет, меня зовут Ягами Лайт")
+    await message.answer("Привет, меня зовут Ягами Лайт.")
 
 @router.message()
 async def handle_message(message: types.Message):
@@ -58,7 +58,7 @@ async def handle_message(message: types.Message):
                 {"role": "system", "content": PERSONA},
                 {"role": "user", "content": user_message}
             ],
-            max_tokens=150,
+            max_tokens=512,
             temperature=0.8
         )
         reply = response.choices[0].message.content.strip()
