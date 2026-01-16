@@ -14,7 +14,7 @@ try:
 except Exception as e:
     logger.error(f"❌ persona.txt: {e}")
     raise
-    
+
 try:
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
     logger.info("✅ Groq")
@@ -46,7 +46,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
-        logger.error("❌ TELEGRAM_BOT_TOKEN ")
+        logger.error("❌ TELEGRAM_BOT_TOKEN не задан!")
         return
 
     port = int(os.environ.get("PORT", 10000))
