@@ -52,7 +52,7 @@ def main():
         logger.error("❌ TELEGRAM_BOT_TOKEN не задан!")
         return
 
-    port = int(os.environ.get("PORT", 10000))  # ← ВСЕГДА 10000 на Render
+    port = int(os.environ.get("PORT", 10000))
     hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "localhost")
     webhook_url = f"https://{hostname}/{token}" if hostname != "localhost" else None
 
