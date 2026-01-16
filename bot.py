@@ -1,7 +1,10 @@
 import os
 import logging
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from aiogram import Bot, Dispatcher, Router, types
+from aiogram.filters import Command
+from aiogram.types import Message
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
 from groq import Groq
 
 logging.basicConfig(level=logging.INFO)
@@ -22,11 +25,24 @@ except Exception as e:
     logger.error(f"❌ Ошибка Groq: {e}")
     raise
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Привет! Я — ваш виртуальный собеседник. О чём поговорим?")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+PORT = int(os.getenv("PORT", 10000))
+HOST = "0.0.0.0"
+WEBHOOK_PATH = f"/{TOKEN}"
+BASE_URL = f"https://{os.getenv('RENDER_EXTERNAL_HOSTNAME', 'localhost')}"
+WEBHOOK_URL = f"{BASE_URL}{WEBHOOK_PATH}"
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_message = update.message.text
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+router = Router()
+
+@router.message(Command("start"))
+async def cmd_start(message: Message):
+    await message.answer("Привет! Я — ваш виртуальный собеседник. О чём поговорим?")
+
+@router.message()
+async def handle_message(message: types.Message):
+    user_message = message.text
     try:
         response = client.chat.completions.create(
             model="llama3-8b-8192",
@@ -38,39 +54,30 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             temperature=0.8
         )
         reply = response.choices[0].message.content.strip()
-        await update.message.reply_text(reply)
+        await message.answer(reply)
     except Exception as e:
-        await update.message.reply_text("Произошла ошибка. Попробуйте позже.")
+        await message.answer("Произошла ошибка. Попробуйте позже.")
         logger.error(f"Ошибка генерации: {e}")
 
+async def on_startup(app: web.Application):
+    await bot.set_webhook(url=WEBHOOK_URL)
+    logger.info(f"🔗 Webhook установлен: {WEBHOOK_URL}")
+
+async def on_shutdown(app: web.Application):
+    await bot.delete_webhook(drop_pending_updates=True)
+    await bot.session.close()
+
 def main():
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    if not token:
-        logger.error("❌ TELEGRAM_BOT_TOKEN не задан!")
-        return
+    dp.include_router(router)
 
-    port = int(os.environ.get("PORT", 10000))
-    hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "localhost")
-    webhook_url = f"https://{hostname}/{token}" if hostname != "localhost" else None
+    app = web.Application()
+    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
+    setup_application(app, dp, bot=bot)
 
-    logger.info(f"🚀 Запуск бота на порту {port}")
-    if webhook_url:
-        logger.info(f"🔗 Webhook URL: {webhook_url}")
+    app.on_startup.append(on_startup)
+    app.on_shutdown.append(on_shutdown)
 
-    app = Application.builder().token(token).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-    if webhook_url:
-        app.run_webhook(
-            listen="0.0.0.0",
-            port=port,
-            url_path=token,
-            webhook_url=webhook_url
-        )
-    else:
-        app.run_polling()
+    web.run_app(app, host=HOST, port=PORT)
 
 if __name__ == "__main__":
     main()
