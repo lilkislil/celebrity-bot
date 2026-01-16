@@ -7,29 +7,33 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 from aiohttp import web
 from groq import Groq
 
+# Логирование
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 try:
     with open("persona.txt", "r", encoding="utf-8") as f:
         PERSONA = f.read()
-    logger.info("✅ persona.txt")
+    logger.info("✅ persona.txt успешно загружен")
 except Exception as e:
-    logger.error(f"❌ persona.txt: {e}")
+    logger.error(f"❌ Ошибка при загрузке persona.txt: {e}")
     raise
 
 try:
     groq_api_key = os.getenv("GROQ_API_KEY")
     if not groq_api_key:
         raise ValueError("GROQ_API_KEY не задан в переменных окружения")
-    
-    client = Groq(api_key=groq_api_key, timeout=30.0)
-    logger.info("✅ Groq")
+    client = Groq(api_key=groq_api_key)
+    logger.info("✅ Groq клиент создан")
 except Exception as e:
-    logger.error(f"❌ Groq: {e}")
+    logger.error(f"❌ Ошибка Groq: {e}")
     raise
 
+# Инициализация
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if not TOKEN:
+    raise ValueError("TELEGRAM_BOT_TOKEN не задан")
+
 PORT = int(os.getenv("PORT", 10000))
 HOST = "0.0.0.0"
 WEBHOOK_PATH = f"/{TOKEN}"
@@ -42,13 +46,13 @@ router = Router()
 
 @router.message(Command("start"))
 async def cmd_start(message: Message):
-    await message.answer("Здраыствуй, меня зовут Ягами Лайт")
+    await message.answer("Привет! Я — ваш виртуальный собеседник. О чём поговорим?")
 
 @router.message()
 async def handle_message(message: types.Message):
     user_message = message.text
     try:
-       response = client.chat.completions.create(
+        response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": PERSONA},
