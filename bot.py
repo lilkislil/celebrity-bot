@@ -46,14 +46,14 @@ router = Router()
 
 @router.message(Command("start"))
 async def cmd_start(message: Message):
-    await message.answer("Привет, меня зовут Ягами Лайт)")
+    await message.answer("Привет, меня зовут Ягами Лайт")
 
 @router.message()
 async def handle_message(message: types.Message):
     user_message = message.text
     try:
         response = client.chat.completions.create(
-            model="gemma2-9b-it",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": PERSONA},
                 {"role": "user", "content": user_message}
