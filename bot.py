@@ -10,16 +10,16 @@ logger = logging.getLogger(__name__)
 try:
     with open("persona.txt", "r", encoding="utf-8") as f:
         PERSONA = f.read()
-    logger.info("✅ persona.txt")
+    logger.info("✅ persona.txt успешно загружен")
 except Exception as e:
-    logger.error(f"❌ persona.txt: {e}")
+    logger.error(f"❌ Ошибка при загрузке persona.txt: {e}")
     raise
 
 try:
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    logger.info("✅ Groq")
+    logger.info("✅ Groq клиент создан")
 except Exception as e:
-    logger.error(f"❌ Groq: {e}")
+    logger.error(f"❌ Ошибка Groq: {e}")
     raise
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
