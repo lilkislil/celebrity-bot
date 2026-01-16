@@ -13,16 +13,20 @@ logger = logging.getLogger(__name__)
 try:
     with open("persona.txt", "r", encoding="utf-8") as f:
         PERSONA = f.read()
-    logger.info("✅ persona.txt успешно загружен")
+    logger.info("✅ persona.txt")
 except Exception as e:
-    logger.error(f"❌ Ошибка при загрузке persona.txt: {e}")
+    logger.error(f"❌ persona.txt: {e}")
     raise
 
 try:
-    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    logger.info("✅ Groq клиент создан")
+    groq_api_key = os.getenv("GROQ_API_KEY")
+    if not groq_api_key:
+        raise ValueError("GROQ_API_KEY не задан в переменных окружения")
+    
+    client = Groq(api_key=groq_api_key)
+    logger.info("✅ Groq")
 except Exception as e:
-    logger.error(f"❌ Ошибка Groq: {e}")
+    logger.error(f"❌ Groq: {e}")
     raise
 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
