@@ -60,10 +60,14 @@ def main():
     if webhook_url:
         logger.info(f"🔗 Webhook URL: {webhook_url}")
 
+    # Создаём Application — НЕ Updater!
     app = Application.builder().token(token).build()
+
+    # Добавляем обработчики
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
+    # Запускаем через webhook
     if webhook_url:
         app.run_webhook(
             listen="0.0.0.0",
