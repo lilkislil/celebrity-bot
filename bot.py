@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 try:
     with open("persona.txt", "r", encoding="utf-8") as f:
         PERSONA = f.read()
-    logger.info("✅ persona.txt успешно загружен")
+    logger.info("✅ persona.txt")
 except Exception as e:
-    logger.error(f"❌ Ошибка при загрузке persona.txt: {e}")
+    logger.error(f"❌ persona.txt: {e}")
     raise
 
 try:
