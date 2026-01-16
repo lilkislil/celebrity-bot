@@ -23,7 +23,7 @@ try:
     if not groq_api_key:
         raise ValueError("GROQ_API_KEY не задан в переменных окружения")
     
-    client = Groq(api_key=groq_api_key)
+    client = Groq(api_key=groq_api_key, timeout=30.0)
     logger.info("✅ Groq")
 except Exception as e:
     logger.error(f"❌ Groq: {e}")
