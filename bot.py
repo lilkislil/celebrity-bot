@@ -58,7 +58,7 @@ async def handle_message(message: types.Message):
                 {"role": "system", "content": PERSONA},
                 {"role": "user", "content": user_message}
             ],
-            max_tokens=512,
+            max_tokens=164,
             temperature=0.8
         )
         reply = response.choices[0].message.content.strip()
