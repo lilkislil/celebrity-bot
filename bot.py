@@ -48,8 +48,8 @@ async def cmd_start(message: Message):
 async def handle_message(message: types.Message):
     user_message = message.text
     try:
-        response = client.chat.completions.create(
-            model="llama3-8b-8192",
+       response = client.chat.completions.create(
+    model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": PERSONA},
                 {"role": "user", "content": user_message}
