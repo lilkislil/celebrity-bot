@@ -24,9 +24,9 @@ try:
     if not groq_api_key:
         raise ValueError("GROQ_API_KEY не задан в переменных окружения")
     client = Groq(api_key=groq_api_key)
-    logger.info("✅ Groq клиент создан")
+    logger.info("✅ Groq")
 except Exception as e:
-    logger.error(f"❌ Ошибка Groq: {e}")
+    logger.error(f"❌ Groq: {e}")
     raise
 
 # Инициализация
