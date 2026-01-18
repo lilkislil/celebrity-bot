@@ -47,7 +47,7 @@ if not TOKEN:
 
 PORT = int(os.getenv("PORT", 10000))
 HOST = "0.0.0.0"
-WEBHOOK_PATH = f"/webhook/{TOKEN}"
+WEBHOOK_PATH = f"/{TOKEN}"
 BASE_URL = f"https://{os.getenv('RENDER_EXTERNAL_HOSTNAME', 'localhost')}"
 WEBHOOK_URL = f"{BASE_URL}{WEBHOOK_PATH}"
 
@@ -241,8 +241,7 @@ def main():
     app = web.Application()
     webhook_handler = SimpleRequestHandler(
         dispatcher=dp,
-        bot=bot,
-        secret_token=TOKEN
+        bot=bot
     )
     webhook_handler.register(app, path=WEBHOOK_PATH)
     setup_application(app, dp, bot=bot)
